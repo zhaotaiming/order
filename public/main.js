@@ -19,6 +19,7 @@ function addEntryRow() {
   const row = document.createElement("div");
   row.className = "entry";
   row.innerHTML = `
+    <input type="number" placeholder="数量" class="qty" style="width: 60px;" />
     <textarea rows="2" placeholder="メッセージ"></textarea>
     <div class="drop-zone" style="border: 2px dashed #aaa; padding: 10px; width: 100px; text-align: center; cursor: pointer; position: relative;">
       <span>📥 画像をドラッグ</span>
@@ -34,22 +35,16 @@ function addEntryRow() {
 
   dropZone.addEventListener("click", () => fileInput.click());
 
-  // ✅ 显示预览图的函数
-  function showPreview(file) {
-    if (!file || !file.type.startsWith("image/")) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      previewImg.src = reader.result;
-      previewImg.style.display = "block";
-      labelSpan.textContent = "✅ 画像選択済";
-    };
-    reader.readAsDataURL(file);
-  }
-
   fileInput.addEventListener("change", () => {
     const file = fileInput.files[0];
     if (file) {
-      showPreview(file);
+      const reader = new FileReader();
+      reader.onload = () => {
+        previewImg.src = reader.result;
+        previewImg.style.display = "block";
+        labelSpan.textContent = "✅ 画像選択済";
+      };
+      reader.readAsDataURL(file);
     } else {
       labelSpan.textContent = "📥 画像をドラッグ";
       previewImg.style.display = "none";
@@ -71,13 +66,18 @@ function addEntryRow() {
     if (e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
       fileInput.files = e.dataTransfer.files;
-      showPreview(file);
+      const reader = new FileReader();
+      reader.onload = () => {
+        previewImg.src = reader.result;
+        previewImg.style.display = "block";
+        labelSpan.textContent = "✅ 画像選択済";
+      };
+      reader.readAsDataURL(file);
     }
   });
 
   formArea.appendChild(row);
 }
-
 
 addRowBtn.addEventListener("click", () => addEntryRow());
 
@@ -88,9 +88,10 @@ submitBtn.addEventListener("click", async () => {
 
   entries.forEach(entry => {
     const msg = entry.querySelector("textarea").value.trim();
+    const qty = parseInt(entry.querySelector("input.qty").value || "0", 10);
     const file = entry.querySelector("input[type='file']").files[0];
     if (msg) {
-      messages.push(msg);
+      messages.push({ msg, qty });
       if (file) formData.append("images", file);
       else formData.append("images", new Blob());
     }
@@ -111,18 +112,11 @@ submitBtn.addEventListener("click", async () => {
   loadMessages();
 });
 
-document.getElementById("exportBtn").addEventListener("click", () => {
-  window.location.href = "/api/export/excel";
-});
-
 async function loadMessages() {
   const res = await fetch("/api/messages");
   const data = await res.json();
 
-  messagesDiv.innerHTML = `
-    <strong>投稿一覧：</strong><br />
-    <button id="exportBtn">Excelダウンロード</button><br /><br />
-  `;
+  messagesDiv.innerHTML = `<strong>投稿一覧：</strong><br /><br />`;
 
   const groups = {};
   data.forEach(item => {
@@ -133,19 +127,35 @@ async function loadMessages() {
   Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(groupId => {
     const group = document.createElement("div");
     group.className = "group";
-    group.innerHTML = `<strong>🧾 グループ: ${groupId}</strong><br />`;
-    groups[groupId].forEach(({ message, created_at, image }) => {
-      group.innerHTML += `
-        <p>📨 ${message}<br>🕒 ${new Date(created_at).toLocaleString()}</p>
-        ${image ? `<img src="/uploads/${image}" class="preview" style="max-width: 150px; border: 1px solid #ccc;" />` : ""}
-        <hr>`;
+
+    const header = document.createElement("div");
+    header.innerHTML = `
+      <strong>🧾 グループ: ${groupId}</strong>
+      <button style="margin-left: 10px;">このグループだけExcelダウンロード</button>
+      <br /><br />
+    `;
+    const downloadBtn = header.querySelector("button");
+    downloadBtn.addEventListener("click", () => {
+      window.location.href = `/api/export/excel?group_id=${encodeURIComponent(groupId)}`;
     });
+
+    group.appendChild(header);
+
+    groups[groupId].forEach(({ message, image, quantity }) => {
+      const item = document.createElement("div");
+      item.className = "message-row";
+      item.innerHTML = `
+  ${image ? `<img src="/uploads/${image}" class="preview side-image" />` : ""}
+  <div class="text-block">
+    <p>📨 ${message}（数量：${quantity || 0}）</p>
+  </div>
+`;
+
+      group.appendChild(item);
+    });
+
     messagesDiv.appendChild(group);
   });
-
-  document.getElementById("exportBtn").onclick = () => {
-    window.location.href = "/api/export/excel";
-  };
 }
 
 addEntryRow();

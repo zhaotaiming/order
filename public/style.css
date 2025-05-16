@@ -1,6 +1,7 @@
+/* 通用设置 */
 body {
   font-family: 'Segoe UI', sans-serif;
-  background-color: #f9f9f9;
+  background-color: #f5f7fa;
   padding: 20px;
   display: flex;
   justify-content: center;
@@ -8,30 +9,50 @@ body {
 
 .container {
   background: white;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 30px;
-  width: 600px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 720px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
 }
 
-h1 {
+/* 标题 */
+h2 {
   text-align: center;
   color: #333;
+  margin-bottom: 25px;
 }
 
+/* 投稿表单每条输入行 */
 .entry {
   display: flex;
   align-items: center;
-  gap: 15px;
-  margin-bottom: 10px;
+  gap: 12px;
+  margin-bottom: 15px;
+  padding: 12px;
+  background: #f0f4ff;
+  border-radius: 8px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.04);
 }
 
+/* 数量栏 */
+.qty {
+  width: 60px;
+  padding: 6px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* 消息输入框 */
 textarea {
   flex: 1;
-  padding: 5px;
+  padding: 8px;
   font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
+/* 拖拽上传区域 */
 .drop-zone {
   width: 100px;
   height: 100px;
@@ -44,16 +65,29 @@ textarea {
   justify-content: center;
   font-size: 12px;
   background-color: #fafafa;
+  border-radius: 8px;
+  position: relative;
 }
 
+/* 图片预览 */
+.preview-img,
+.preview {
+  max-width: 100px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-top: 6px;
+}
+
+/* 按钮样式 */
 button {
-  padding: 6px 12px;
+  padding: 8px 14px;
   font-size: 14px;
   border: none;
   border-radius: 6px;
   background-color: #3b82f6;
   color: white;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 button:hover {
@@ -66,17 +100,117 @@ button:hover {
   margin-bottom: 20px;
 }
 
-.preview {
-  max-width: 150px;
-  margin: 5px 0;
+/* 投稿分组卡片 */
+.group {
+  background: #f9fafc;
+  border-left: 4px solid #3b82f6;
+  padding: 15px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
+}
+
+.group strong {
+  font-size: 16px;
+}
+
+.group button {
+  float: right;
+  background-color: #10b981;
+}
+
+.group button:hover {
+  background-color: #059669;
+}
+
+/* 每条 message 左右排列样式 */
+.message-row {
+  display: flex;
+  align-items: center;
+  /* 垂直居中 */
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background-color: #dbeafe;
   border-radius: 6px;
+}
+
+.message-row .side-image {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
   border: 1px solid #ccc;
 }
 
-.group {
-  margin-bottom: 20px;
-  padding: 15px;
-  background: #eef3ff;
-  border-left: 5px solid #3b82f6;
-  border-radius: 4px;
+.text-block {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* 顶部导出按钮样式 */
+#exportBtn {
+  background-color: #06b6d4;
+}
+
+#exportBtn:hover {
+  background-color: #0891b2;
+}
+
+@media (max-width: 768px) {
+
+  /* 页面容器缩小 */
+  .container {
+    width: 100%;
+    padding: 20px;
+    margin: 0 10px;
+  }
+
+  /* 投稿行竖排 */
+  .entry {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .entry .qty {
+    width: 100%;
+  }
+
+  .drop-zone {
+    width: 100%;
+    height: auto;
+  }
+
+  .drop-zone span {
+    font-size: 14px;
+  }
+
+  /* 投稿显示 - 图片在上，文字在下 */
+  .message-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .message-row .side-image {
+    width: 100%;
+    height: auto;
+    max-width: 300px;
+    margin-bottom: 8px;
+  }
+
+  .text-block {
+    width: 100%;
+  }
+
+  /* 按钮铺满 */
+  button {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .group button {
+    float: none;
+    margin-top: 8px;
+  }
 }
